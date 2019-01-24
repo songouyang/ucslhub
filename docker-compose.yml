@@ -1,0 +1,47 @@
+version: "3.2"
+services:
+  proxy:
+    env_file: .penv
+    image: jupyterhub/configurable-http-proxy:3.1.1
+    networks:
+      - jupynet
+    expose:
+      - "8000"
+    command:
+      - configurable-http-proxy
+      - '--error-target'
+      - 'http://hub/hub/error'
+    userns_mode: "host"
+
+  ubuntu:
+    image: ubuntu:latest
+    entrypoint: /bin/bash
+    stdin_open: true
+    tty: true
+    networks:
+      - jupynet
+    volumes:
+      - "/data:/data"
+    userns_mode: "host"
+
+  hub:
+    # build an image with SwarmSpawner and our jupyterhub_config.py
+    env_file: .henv
+    build:
+      context: "./"
+      dockerfile: "Dockerfile"
+    # mount the docker socket and nfs share
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/data:/data"
+    networks:
+      - jupynet
+    userns_mode: "host"
+
+networks:
+  jupynet:
+    driver: overlay
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.10.11.0/24
