@@ -1,4 +1,6 @@
 import os
+import sys
+
 # Teaching Assistants (these will be able to create and modify assignments)
 teaching_assistants = ['syn']
 
@@ -8,7 +10,7 @@ c.ConfigurableHTTPProxy.api_url = 'http://proxy:8001'
 
 # use oauth
 c.JupyterHub.authenticator_class = 'oauthenticator.generic.GenericOAuthenticator'
-c.OAuthenticator.client_id = os.environ['OAUTH2_CLIENTID']  # oauth2 client id for your app
+c.OAuthenticator.client_id = os.environ['OAUTH2_CLIENT_ID']  # oauth2 client id for your app
 c.OAuthenticator.client_secret =  os.environ['OAUTH2_CLIENT_SECRET']  # oauth2 client secret for your app..
 c.GenericOAuthenticator.token_url = os.environ['OAUTH2_TOKEN_URL'] # oauth2 provider's token url
 c.GenericOAuthenticator.userdata_url = os.environ['OAUTH2_USERDATA_URL'] # oauth2 provider's endpoint with user data
