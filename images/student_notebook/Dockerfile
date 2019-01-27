@@ -9,6 +9,4 @@ RUN jupyter nbextension disable --user create_assignment/main && \
     jupyter serverextension disable --user nbgrader.server_extensions.formgrader && \
     fix-permissions /home/$NB_USER
 
-COPY nbgrader_config.py /home/jovyan/.jupyter/nbgrader_config.py
-
 WORKDIR /home/jovyan/
