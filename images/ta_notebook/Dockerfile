@@ -5,7 +5,7 @@ FROM jupyter/scipy-notebook
 USER $NB_UID
 
 #Install nbgrader
-RUN pip install nbgrader && \
+RUN pip install --no-cache nbgrader && \
     jupyter nbextension install --user --py nbgrader && \
     jupyter nbextension enable --user --py nbgrader && \
     jupyter serverextension enable --user --py nbgrader && \
