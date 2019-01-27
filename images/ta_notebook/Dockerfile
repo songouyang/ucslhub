@@ -2,6 +2,8 @@
 # Distributed under the terms of the Modified BSD License.
 FROM jupyter/scipy-notebook
 
+LABEL maintainer="Mohit Sharma <Mohitsharma44@gmail.com>"
+
 USER $NB_UID
 
 #Install nbgrader

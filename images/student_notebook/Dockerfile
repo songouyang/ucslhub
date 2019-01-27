@@ -1,5 +1,7 @@
 FROM cusp/ucsl-ta_notebook:latest
 
+LABEL maintainer="Mohit Sharma <Mohitsharma44@gmail.com>"
+
 USER $NB_UID
 
 RUN jupyter nbextension disable --user create_assignment/main && \
