@@ -8,4 +8,4 @@ ADD dockerspawner /tmp/dockerspawner
 # Install oAuthenticator
 RUN pip install --no-cache oauthenticator /tmp/dockerspawner/
 # load configuration
-ADD jupyterhub_config.py /srv/jupyterhub/jupyterhub_config.py
+COPY jupyterhub_config.py admins.txt teaching_assistants.txt /srv/jupyterhub/
