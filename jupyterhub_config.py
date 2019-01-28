@@ -2,7 +2,9 @@ import os
 import sys
 
 # Teaching Assistants (these will be able to create and modify assignments)
-teaching_assistants = ['syn']
+teaching_assistants = []
+with open('teaching_assistants.txt', 'r') as fh:
+    teaching_assistants = list(map(lambda x: x.strip(), fh.readlines()))
 
 # The proxy is in another container
 c.ConfigurableHTTPProxy.should_start = False
@@ -18,12 +20,20 @@ c.GenericOAuthenticator.userdata_method = 'GET'  # method used to request user d
 c.GenericOAuthenticator.userdata_params = {"state": "state"} # params to send for userdata endpoint
 c.GenericOAuthenticator.username_key = "preferred_username"  # username key from json returned from user data endpoint
 
+
+with open('admins.txt', 'r') as fh:
+    c.Authenticator.admin_users = list(map(lambda x: x.strip(), fh.readlines()))
+
+#c.Authenticator.admin_users = {'mohitsharma44'}
+
 # use SwarmSpawner
 # Mount user directory
 import pwd
 def mount_user_dirs(spawner):
     username = spawner.user.name
     basedir = os.environ['JUPYHOST_BASEDIR']
+    nbgraderdir = os.environ['NBGRADER_BASEDIR']
+    ucsldir = os.environ['UCSL_BASEDIR']
     userpath = os.path.join(basedir, username)
     if not os.path.exists(userpath):
         os.makedirs(userpath)
@@ -32,13 +42,20 @@ def mount_user_dirs(spawner):
         uid = 1002 #pwd.getpwnam('ucsluser').pw_uid
         gid = 1002 #pwd.getpwnam('ucsluser').pw_gid
         os.chown(userpath, uid, gid)
-    mounts_user = [
-        {'type': 'bind',
-         'source': os.path.join(basedir, username),
-         'target': '/home/jovyan/{}'.format(username)}
-    ]
-    spawner.extra_container_spec = {'mounts': mounts_user}
-    spawner.notebook_dir = '/home/jovyan/{}'.format(username)
+    mounts_user = ["{}:{}:rw".format(os.path.join(basedir, username), '/home/jovyan/{}'.format(username)),
+                   "{}:{}:rw".format(nbgraderdir, '/srv/nbgrader/exchange'),
+                   "{}:{}:ro".format(ucsldir, '/home/jovyan/ucsl')]
+    env = spawner.get_env()
+    if username in teaching_assistants:
+        # add some environment vars
+        env['ta'] = username
+    else:
+        env['username'] = username
+    env['JUPYTERHUB_USER'] = username
+    spawner.extra_container_spec = {'mounts': mounts_user,
+				    'env': env}
+    #spawner.notebook_dir = '/home/jovyan/{}'.format(username)
+    spawner.notebook_dir = '/home/jovyan/'
     if username in teaching_assistants:
         spawner.image = os.environ['HUB_TA_IMAGE']
     else:
@@ -71,8 +88,8 @@ c.SwarmSpawner.network_name = 'ucslhub_jupynet'
 c.SwarmSpawner.use_internal_ip = True
 #c.SwarmSpawner.extra_host_config = {'network_mode': 'jupyterhub_jupynet'}
 #c.SwarmSpawner.remove_services = True
-#c.Spawner.mem_limit = '1G'
-#c.Spawner.cpu_limit = 2
+c.Spawner.mem_limit = '512M'
+c.Spawner.cpu_limit = 1
 
 # start jupyterlab
 c.Spawner.pre_spawn_hook = mount_user_dirs
