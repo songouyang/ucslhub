@@ -36,7 +36,7 @@ def mount_user_dirs(spawner):
     ucsldir = os.environ['UCSL_BASEDIR']
     userpath = os.path.join(basedir, username)
     if not os.path.exists(userpath):
-        os.makedirs(userpath)
+        os.makedirs(userpath, 'work', 'assignments')
         # this is run as root, so chown to uscluser
         # get uid and gid for ucsluser
         uid = 1002 #pwd.getpwnam('ucsluser').pw_uid
