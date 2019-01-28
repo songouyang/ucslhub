@@ -4,10 +4,12 @@ FROM jupyter/scipy-notebook
 
 LABEL maintainer="Mohit Sharma <Mohitsharma44@gmail.com>"
 
-USER $NB_UID
+# copy nbgrader
+COPY nbgrader.zip /tmp/
 
-#Install nbgrader
-RUN pip install --no-cache nbgrader && \
+# install nbgrader
+#RUN pip install --no-cache nbgrader && \
+RUN pip install --no-cache /tmp/nbgrader.zip && \
     jupyter nbextension install --user --py nbgrader && \
     jupyter nbextension enable --user --py nbgrader && \
     jupyter serverextension enable --user --py nbgrader && \
