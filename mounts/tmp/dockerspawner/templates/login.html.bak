@@ -1,0 +1,2 @@
+{% extends "templates/login.html" %}
+{% set announcement = 'This should be displayed at Login' %}

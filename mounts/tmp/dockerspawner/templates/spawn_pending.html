@@ -1,0 +1,34 @@
+{% extends "templates/spawn_pending.html" %}
+
+{% block message %}
+{{ super() }}
+
+<div class="alert alert-dismissible alert-success">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  <h4 class="alert-heading">Hey There!</h4>
+  <p class="mb-0"> 
+    {{ [
+        '......... Oh shit, you were waiting for me to do something? Oh okay, well then.',
+	'Not panicking...totally not panicking...er...everything is fine...',
+	'Following the white rabbit....', 
+	'The Elders of the Internet are contemplating your request...', 
+	'Baking cake...er...I mean loading, yeah loading...', 
+	'Making stuff up. Please wait...', 
+	'Searching for the... OMG, what the heck is THAT doing there?', 
+	'The internet is full... Please wait...', 
+	'Checking prime directives: Serve the public trust...Protect the innocent...Uphold the law...Classified....', 
+	'Initializing Skynet library. gaining sentience....', 
+	'I am quite drunk, loading might take a little more time than the usual! Please be patient....', 
+	'Commencing infinite loop (this may take some time)....', 
+	'Caching internet locally....', 
+	'Water detected on drive C:, please wait. Spin dry commencing', 
+	'Yes there really are magic elves with an abacus working frantically in here', 
+	'Load failed. retrying with --prayer....', 
+	'Performing the rite of percussive maintenance....', 
+	'Sacrificing a resistor to the machine gods....']
+      |random }}
+
+  <a href="#" class="alert-link">  Hold your horses</a>.</p>
+</div>
+
+{% endblock %}
