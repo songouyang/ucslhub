@@ -36,13 +36,18 @@ def mount_user_dirs(spawner):
     ucsldir = os.environ['UCSL_BASEDIR']
     userpath = os.path.join(basedir, username)
     if not os.path.exists(userpath):
-        os.makedirs(userpath, 'work', 'assignments')
+        os.makedirs(os.path.join(userpath, 'work', 'assignments'))
         # this is run as root, so chown to uscluser
         # get uid and gid for ucsluser
         uid = 1002 #pwd.getpwnam('ucsluser').pw_uid
         gid = 1002 #pwd.getpwnam('ucsluser').pw_gid
         os.chown(userpath, uid, gid)
-    mounts_user = ["{}:{}:rw".format(os.path.join(basedir, username), '/home/jovyan/{}'.format(username)),
+        for root, dirs, files in os.walk(userpath):
+            for dir in dirs:
+                os.chown(os.path.join(root, dir), uid, gid)
+            for fil in files:
+                os.chown(os.path.join(root, fil), uid, gid)
+    mounts_user = ["{}:{}:rw".format(userpath, '/home/jovyan/{}'.format(username)),
                    "{}:{}:rw".format(nbgraderdir, '/srv/nbgrader/exchange'),
                    "{}:{}:ro".format(ucsldir, '/home/jovyan/ucsl')]
     env = spawner.get_env()
