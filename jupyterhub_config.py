@@ -35,12 +35,15 @@ def mount_user_dirs(spawner):
     nbgraderdir = os.environ['NBGRADER_BASEDIR']
     ucsldir = os.environ['UCSL_BASEDIR']
     userpath = os.path.join(basedir, username)
+    # this is run as root, so chown to uscluser
+    # get uid and gid for ucsluser
+    uid = 1002 #pwd.getpwnam('ucsluser').pw_uid
+    gid = 1002 #pwd.getpwnam('ucsluser').pw_gid
+    if not os.path.exists(nbgraderdir):
+        os.makedirs(nbgraderdir)
+        os.chown(nbgraderdir, uid, gid)
     if not os.path.exists(userpath):
         os.makedirs(os.path.join(userpath, 'work', 'assignments'))
-        # this is run as root, so chown to uscluser
-        # get uid and gid for ucsluser
-        uid = 1002 #pwd.getpwnam('ucsluser').pw_uid
-        gid = 1002 #pwd.getpwnam('ucsluser').pw_gid
         os.chown(userpath, uid, gid)
         for root, dirs, files in os.walk(userpath):
             for dir in dirs:
@@ -57,14 +60,21 @@ def mount_user_dirs(spawner):
     else:
         env['username'] = username
     env['JUPYTERHUB_USER'] = username
-    spawner.extra_container_spec = {'mounts': mounts_user,
-				    'env': env}
+    #spawner.extra_container_spec = {'mounts': mounts_user,
+    #				    'env': env}
     #spawner.notebook_dir = '/home/jovyan/{}'.format(username)
     spawner.notebook_dir = '/home/jovyan/'
+    extra_container_spec = {'mounts': mounts_user}
     if username in teaching_assistants:
         spawner.image = os.environ['HUB_TA_IMAGE']
+        # let this be run as root
+        extra_container_spec.update({'user': 'root'})
+        env['GRANT_SUDO'] = '1'
+        env['UID'] = '0'
     else:
         spawner.image = os.environ['HUB_STUDENT_IMAGE']
+    extra_container_spec.update({'env': env})
+    spawner.extra_container_spec = extra_container_spec
 
 
 c.Spawner.pre_spawn_hook = mount_user_dirs
@@ -98,7 +108,8 @@ c.Spawner.cpu_limit = 1
 
 # start jupyterlab
 c.Spawner.pre_spawn_hook = mount_user_dirs
-c.Spawner.cmd = ["jupyter", "labhub"]
+#c.Spawner.cmd = ["jupyter", "labhub"]
+c.Spawner.cmd = ["jupyter", "labhub", "--allow-root"]
 c.SwarmSpawner.debug = True
 c.Spawner.args = ['--NotebookApp.allow_origin=*']
 
