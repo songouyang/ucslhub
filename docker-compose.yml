@@ -21,7 +21,8 @@ services:
     networks:
       - jupynet
     volumes:
-      - "/data:/data"
+      - "/ucsldata:/ucsldata"
+      - "/ucslgrader:/ucslgrader"
     userns_mode: "host"
 
   hub:
@@ -33,7 +34,8 @@ services:
     # mount the docker socket and nfs share
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "/data:/data"
+      - "/ucsldata:/ucsldata"
+      - "/ucslgrader:/ucslgrader"
     networks:
       - jupynet
     userns_mode: "host"
